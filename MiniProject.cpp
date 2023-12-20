@@ -1,67 +1,178 @@
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <vector>
-#include<limits.h>
+#include <unordered_map>
+
 using namespace std;
+
 vector<string> movies;
-vector<double> timings;
-static int total;
-class Admin{
-    public:
-    void Set(){
-    for (int i = 0; i < 5; i++)
-    {
-        string movie;
-        cin >> (movie);
-        movies.push_back(movie);
-        cout << endl;
-    }
-    cout<<"Movies Available:"<<endl;
-    cout<<"___________________"<<endl;
-    for (int i = 0; i < movies.size(); i++)
-    {
-        cout << i + 1 << "." << movies[i] << endl;
-    }
-    cout<<"___________________"<<endl;
-    int NoOfShows=4;
-    for(int i=0;i<NoOfShows;i++){ 
-        cout<<"Timing For Show "<<i+1<<":"<<endl;
-        double time;
-        cin>>time;
-        timings.push_back(time);        
-        cout << endl;
-    }
-    vector<int> Setprices(movies.size(), 0);
-    cout << "Set Movie Prices:" << endl;
-    for (int i = 0; i < Setprices.size(); i++)
-    {
-        cout<<"\n";
-        int p;
-        cin >> p;
-        if(!(p>=INT_MAX&&p<=INT_MIN))
-        continue;
-        cout << "Price for " << movies[i] << ":" ;
-        Setprices.push_back(p);
-    }
-    }
-};
-class Book: protected Admin
-{
+
+vector<string> timings;
+
+class Movie {
+private:
+    string movieName;
+    float rating;
+    string additionalInfo;
+
 public:
-    int x, y;
-    vector<vector<char>> Box;
-    void SetRowsAndCols(int m, int n)
-    {
-        for (int i = 0; i < m; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                Box[i][j] = '_';
-            }
+    string getName() const {
+        return movieName;
+    }
+
+    void setName(const string& newMovie) {
+        movieName = newMovie;
+    }
+
+    float getRating() const {
+        return rating;
+    }
+
+    void setRating(float newRating) {
+        if (newRating >= 0.0 && newRating <= 10.0) {
+            rating = newRating;
+        } else {
+            cout << "Invalid rating value. Rating should be between 0.0 and 10.0." << endl;
         }
     }
-    void ShowSetMatrix(){
+
+    string getAdditionalInfo() const {
+        return additionalInfo;
+    }
+
+    void setAdditionalInfo(const string& info) {
+        additionalInfo = info;
+    }
+};
+
+class Admin {
+private:
+    const string adminPasswd = "123456789";
+    vector<string> adminIdList;
+    void addAdminId() {
+        adminIdList.push_back("kunalvesit123");
+         adminIdList.push_back("vinitvesit123");
+    }
+
+public:
+    const string& getAdminPasswd() const {
+        return adminPasswd;
+    }
+
+    const vector<string>& getAdminIdList() const {
+        return adminIdList;
+    }
+
+  bool login() {
+    string adminId;
+    cout << "Enter admin username ";
+    cin >> adminId;
+
+    string adminpwd;
+    cout << "Enter admin password ";
+    cin >> adminpwd;
+
+    bool valid = false;
+    for (const string& admin : adminIdList) {
+        if (admin == adminId) {
+            valid = true;
+            break;
+        }
+    }
+
+
+    return valid && adminId == adminpwd;
+}
+
+
+    void SetMoviesAvail(int NoOfShows, unordered_map<string, vector<string>>& MoviMapping) {
+        cout << "Enter the number of movies available for today: ";
+        for (int i = 0; i < NoOfShows; i++) {
+            string movie;
+            cout << "Enter movie name: ";
+            cin >> movie;
+            movies.push_back(movie);
+        }
+
+        for (const auto& movie : movies) {
+			
+
+            cout << "Enter timings for " << movie << " (yr:month:day:hrs:min) :- ";
+            string timing;
+            cin >> timing;
+            timings.push_back(timing);
+        }
+
+        
+        for (int i = 0; i < movies.size(); i++) {
+            MoviMapping[movies[i]].push_back(timings[i]);
+        }
+
+        cout << "Movies and timings set successfully." << endl;
+    }
+
+    void AddMovieInfo(unordered_map<string, vector<string>>& MoviMapping) {
+        string movieName;
+        cout << "Enter the movie name to add more info about it : ";
+        cin >> movieName;
+
+        if (MoviMapping.find(movieName) != MoviMapping.end()) {
+            cout << "Enter additional information for " << movieName << ": ";
+            string additionalInfo;
+            cin.ignore(); 
+            getline(cin, additionalInfo);
+
+    
+            MoviMapping[movieName].push_back(additionalInfo);
+
+            cout << " information added successfully." << endl;
+        } else {
+            cout << "This movie isn't listed, add it first." << endl;
+        }
+    }
+};
+
+//f
+class Customerdisplay{
+public:
+void ShowTimings(int movieNo, unordered_map<string, vector<string>> &MoviMapping ) {
+    if (movieNo >= 0 && movieNo < movies.size()) {
+        cout << "Timings for " << movies[movieNo] << " :- " << endl;
+        const vector<string>& timings = MoviMapping[movies[movieNo]];
+
+        for (int i = 0; i < timings.size(); ++i) {
+            cout << "Show " << i + 1 << ":-" << timings[i] << endl;
+        }
+    } else {
+        cout << "Invalid movie number." << endl;
+    }
+}
+
+void showAdditionalInfo(int movieNo,unordered_map<string, vector<string>> &MoviMapping) {
+    if (movieNo >= 0 && movieNo < movies.size()) {
+        cout << "Additional information for " << movies[movieNo] << ":" << endl;
+         vector<string>& additionalInfoList = MoviMapping[movies[movieNo]];
+
+        for ( string& info : additionalInfoList) {
+            cout << info << endl;
+        }
+    } else {
+        cout << "Invalid movie number." << endl;
+    }
+}
+  
+
+
+
+
+};
+/*  
+
+pending....
+
+class Book: protected Admin{
+
+void ShowSetMatrix(){
         for(int i=0;i<x;i++){
             cout<<"_ _ _ _ _ "<<endl;
             for(int j=0;j<y;j++){
@@ -70,10 +181,7 @@ public:
             cout<<"_ _ _ _ _ "<<endl;
         }
     }
-    void ShowTimings(int movieNo){
-
-    }
-    Book()
+      Book()
     {
         // int n,m;
         // cout<<"Enter Row:"<<endl;
@@ -84,38 +192,102 @@ public:
         // this->y=m;
         // Box[x][y]=1;
     }
+
 };
-int main()
-{
-    Admin a1;
-    a1.Set();
-    //---------Admin Work Done Here!--------------//
-    //MENU:
-    cout<<"=================="<<endl;
-    cout<<"MOVIE TICKET BOOKING MENU:"<<endl;
-    cout<<"1.BOOK TICKETS"<<endl;
-    cout<<"2.SHOW MOVIE TIMINGS"<<endl;
-    cout<<"3.EXTRA SERVICES"<<endl;  
-    Book a;
-    a.ShowSetMatrix();
-        int opt;
-        cout << "Select Any One Movie";
-        cout<<"(Press 6 to exit):"<<endl;
-        cin >> opt;
-        switch (opt + 1)
-        {
-        case 1:{};
-            break;
-        case 2:{};
-            break;
-        case 3:{};
-            break;
-        case 4:{};
-            break;
-        case 5:{};
-            break;
-        case 6:break;
+
+*/
+int main() {
+    unordered_map<string, vector<string>> MoviMapping;
+    Admin admin;
+
+    int choice1;
+    do {
+        cout << "1. Admin Login" << endl;
+        cout << "2. Customer" << endl;
+        cout << "3. Exit" << endl;
+        cout << "Choose an option: ";
+        cin >> choice1;
+
+        switch (choice1) {
+            case 1: {
+                // Admin work...
+                  
+                Admin admin;
+                if (admin.login()) {
+                    int adminChoices;
+                    cout << "Admin Logged in Successfully..." << endl;
+                    cout << "=====================================" << endl;
+                    cout << "ADMIN MENU" << endl;
+                    cout << "1. Set Movies" << endl;
+                    cout << "2. Add Movie Information" << endl;
+                    cout << "3. Exit" << endl;
+                    cout << "Choose an option: ";
+                    cin >> adminChoices;
+                    switch (adminChoices) {
+                        case 1:
+                        
+                            int NoOfShows;
+                            cout << "Enter the number of shows for each movie: ";
+                            cin >> NoOfShows;
+                            admin.SetMoviesAvail(NoOfShows, MoviMapping);
+                            break;
+                        case 2:
+                            admin.AddMovieInfo(MoviMapping);
+                            break;
+                        case 3:
+                            cout << "Exiting Admin Menu..." << endl;
+                            break;
+                        default:
+                            cout << "Invalid option. Try again." << endl;
+                            break;
+                    }
+                } else {
+                    cout << "Admin Login Failed" << endl << "Security issue" << endl;
+                }
+                break;
+            }
+              
+            
+            case 2: {
+                Customerdisplay customer;
+                // Customer work...
+                int CustChoice;
+                cout << "Customer MENU" << endl;
+                cout << "1. Show Movies and Timings" << endl;
+                cout << "2. Show Information about Available Movies" << endl;
+                cout << "3. Book a Ticket for Movies" << endl;
+                cout << "Choose an option: ";
+                cin >> CustChoice;
+                switch (CustChoice) {
+                    case 1:
+                     int movieNo;
+                        cout << "Enter Movie Number: ";
+                        cin >> movieNo;
+                        customer.ShowTimings(movieNo,MoviMapping);
+                        break;
+                    case 2:
+                    int no;
+                        cout << "Enter Movie Number: ";
+                        cin >> no;
+                        customer.showAdditionalInfo(no, MoviMapping);
+                        break;
+                    case 3:
+                        cout << "Book a Ticket (Not implemented yet)" << endl;
+                        break;
+                    default:
+                        cout << "Invalid option. Try again." << endl;
+                        break;
+                }
+                break;
+            }
+            case 3:
+                cout << "Exiting..." << endl;
+                break;
+            default:
+                cout << "Invalid option" << endl;
+                break;
         }
-    // a.SetRowsAndCols(5,5);
+    } while (choice1 != 3);
+
     return 0;
 }
